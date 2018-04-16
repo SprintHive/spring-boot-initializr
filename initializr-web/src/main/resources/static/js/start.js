@@ -158,10 +158,7 @@ $(function () {
     };
     var generatePackageName = function() {
         var groupId = $("#groupId").val();
-        var artifactId = $("#artifactId").val();
-        var package = groupId.concat(".").concat(artifactId)
-            .replace(/-/g, '');
-        $("#packageName").val(package);
+        $("#packageName").val(groupId);
     };
     refreshDependencies($("#bootVersion").val());
     $("#type").on('change', function () {

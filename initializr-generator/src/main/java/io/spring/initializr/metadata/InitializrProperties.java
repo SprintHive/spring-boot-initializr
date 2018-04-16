@@ -72,13 +72,13 @@ public class InitializrProperties extends InitializrConfiguration {
 	 * GroupId metadata.
 	 */
 	@JsonIgnore
-	private final SimpleElement groupId = new SimpleElement("com.example");
+	private final SimpleElement groupId = new SimpleElement("com.sprinthive.origination");
 
 	/**
 	 * ArtifactId metadata.
 	 */
 	@JsonIgnore
-	private final SimpleElement artifactId = new SimpleElement(null);
+	private final SimpleElement artifactId = new SimpleElement("origination-kyc-service");
 
 	/**
 	 * Version metadata.
@@ -90,14 +90,14 @@ public class InitializrProperties extends InitializrConfiguration {
 	 * Name metadata.
 	 */
 	@JsonIgnore
-	private final SimpleElement name = new SimpleElement("demo");
+	private final SimpleElement name = new SimpleElement("OriginationKyc");
 
 	/**
 	 * Description metadata.
 	 */
 	@JsonIgnore
 	private final SimpleElement description = new SimpleElement(
-			"Demo project for Spring Boot");
+			"SprintHive Origination KYC Service");
 
 	/**
 	 * Package name metadata.

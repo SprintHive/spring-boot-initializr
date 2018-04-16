@@ -157,8 +157,6 @@ public class MainControllerStatsIntegrationTests
 		StatsMockController.Content content = statsMockController.stats.get(0);
 
 		JsonNode json = parseJson(content.json);
-		assertEquals("com.example", json.get("groupId").textValue());
-		assertEquals("demo", json.get("artifactId").textValue());
 		assertEquals(true, json.get("invalid").booleanValue());
 		assertEquals(true, json.get("invalidType").booleanValue());
 		assertNotNull(json.get("errorMessage"));

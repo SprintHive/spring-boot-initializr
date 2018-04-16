@@ -28,6 +28,7 @@ import io.spring.initializr.generator.ProjectGenerator;
 import io.spring.initializr.generator.ProjectRequestPostProcessor;
 import io.spring.initializr.generator.ProjectRequestResolver;
 import io.spring.initializr.generator.ProjectResourceLocator;
+import io.spring.initializr.generator.SprinthiveProjectGenerator;
 import io.spring.initializr.metadata.DependencyMetadataProvider;
 import io.spring.initializr.metadata.InitializrMetadata;
 import io.spring.initializr.metadata.InitializrMetadataBuilder;
@@ -84,7 +85,7 @@ public class InitializrAutoConfiguration {
 	@Bean
 	@ConditionalOnMissingBean
 	public ProjectGenerator projectGenerator() {
-		return new ProjectGenerator();
+		return new SprinthiveProjectGenerator();
 	}
 
 	@Bean

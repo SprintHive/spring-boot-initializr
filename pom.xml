@@ -43,7 +43,6 @@
 
 	<modules>
 		<module>initializr-actuator</module>
-		<module>initializr-docs</module>
 		<module>initializr-generator</module>
 		<module>initializr-web</module>
 	</modules>

@@ -140,7 +140,7 @@ initializr:
         versionProperty: keycloak.version
         version: 3.4.2.Final
     gradle:
-      dependency-management-plugin-version: 0.6.0.RELEASE
+      dependency-management-plugin-version: 2.0.1.RELEASE
     kotlin:
       default-version: 1.2.20
   dependencies:
@@ -1239,24 +1239,6 @@ initializr:
           groupId: org.springframework.boot
           artifactId: spring-boot-actuator-docs
   types:
-    - name: Maven Project
-      id: maven-project
-      description: Generate a Maven based project archive
-      sts-id: starter.zip
-      tags:
-        build: maven
-        format: project
-      default: true
-      action: /starter.zip
-    - name: Maven POM
-      id: maven-build
-      description: Generate a Maven pom.xml
-      sts-id: pom.xml
-      tags:
-        build: maven
-        format: build
-      default: false
-      action: /pom.xml
     - name: Gradle Project
       id: gradle-project
       description: Generate a Gradle based project archive
@@ -1266,48 +1248,17 @@ initializr:
         format: project
       default: false
       action: /starter.zip
-    - name: Gradle Config
-      id: gradle-build
-      description: Generate a Gradle build file
-      sts-id: build.gradle
-      tags:
-        build: gradle
-        format: build
-      default: false
-      action: /build.gradle
   packagings:
     - name: Jar
       id: jar
       default: true
-    - name: War
-      id: war
-      default: false
   javaVersions:
     - id: 9
       default: false
     - id: 1.8
       name: 8
       default: true
-    - id: 1.7
-      name: 7
-      default: false
   languages:
     - name: Java
       id: java
       default: true
-    - name: Kotlin
-      id: kotlin
-      default: false
-    - name: Groovy
-      id: groovy
-      default: false
-  bootVersions:
-    - name : Latest SNAPSHOT
-      id: 1.2.4.BUILD-SNAPSHOT
-      default: false
-    - name: 1.2.3
-      id: 1.2.3.RELEASE
-      default: true
-    - name: 1.1.12
-      id: 1.1.12.RELEASE
-      default: false

@@ -2,24 +2,24 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   labels:
-    run: {{name}}
+    run: {{artifactId}}
     version: $version
-  name: {{name}}-$version
+  name: {{artifactId}}-$version
 spec:
   replicas: 1
   selector:
     matchLabels:
-      run: {{name}}
+      run: {{artifactId}}
       version: $version
   template:
     metadata:
       labels:
-        run: {{name}}
+        run: {{artifactId}}
         version: $version
     spec:
       containers:
       - image: $image
-        name: {{name}}
+        name: {{artifactId}}
         env:
         - name: APP_VERSION
           value: $version

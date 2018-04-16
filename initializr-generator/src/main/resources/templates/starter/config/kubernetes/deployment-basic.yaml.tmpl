@@ -2,24 +2,24 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   labels:
-    run: {{name}}
+    run: {{artifactId}}
     version: v1
-  name: honeypot-kyc-v1
+  name: {{artifactId}}-v1
 spec:
   replicas: 1
   selector:
     matchLabels:
-      run: {{name}}
+      run: {{artifactId}}
       version: v1
   template:
     metadata:
       labels:
-        run: {{name}}
+        run: {{artifactId}}
         version: v1
     spec:
       containers:
-      - name: {{name}}
-        image: {{name}}:v1
+      - name: {{artifactId}}
+        image: {{artifactId}}:v1
         env:
         - name: APP_VERSION
           value: v1

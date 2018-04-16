@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.Random;
 
 public class SprinthiveProjectGenerator extends ProjectGenerator {
-    @Value("${TMPDIR:.}/initializr")
+    @Value("${TMPDIR:/tmp}/initializr")
     private String tempDir;
 
     private static final String TMPL_DIR_NAME = "starter";
@@ -95,7 +95,9 @@ public class SprinthiveProjectGenerator extends ProjectGenerator {
     private File createTemporaryDirectory() {
         File rootDir;
         try {
-            rootDir = File.createTempFile("tmp", "", new File(tempDir, "initializr"));
+            File tmpPath = new File(tempDir, "initializr");
+            tmpPath.mkdirs();
+            rootDir = File.createTempFile("tmp", "", tmpPath);
         }
         catch (IOException e) {
             throw new IllegalStateException("Cannot create temp dir", e);

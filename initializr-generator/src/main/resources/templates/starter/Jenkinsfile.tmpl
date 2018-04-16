@@ -1,0 +1,45 @@
+#!/usr/bin/groovy
+@Library('github.com/SprintHive/sprinthive-pipeline-library')
+
+def componentName = '{{name}}'
+def versionTag = ''
+def resourcesDir = 'config/kubernetes'
+def dockerImage
+
+gradleNode(label: 'gradle-and-docker') {
+    stage('Compile source') {
+        checkout scm
+        versionTag = getNewVersion {}
+        dockerImage = "${componentName}:${versionTag}"
+
+        container(name: 'gradle') {
+            sh "gradle bootJar"
+        }
+    }
+
+    stage('Publish docker image') {
+        container('docker') {
+            sh "docker build -t ${dockerImage} ."
+        }
+    }
+
+    stage('Rollout to Local') {
+        def namespace = 'local'
+        def deployStage = 'development'
+
+        def kubeResources = kubeResourcesFromTemplates {
+            templates = [
+                readFile(resourcesDir + '/deployment.yaml'),
+                readFile(resourcesDir + '/service.yaml')
+            ]
+            stage = deployStage
+            version = versionTag
+            image = dockerImage
+            name = componentName
+        }
+
+        for (String kubeResource : kubeResources) {
+            kubernetesApply(file: kubeResource, environment: namespace)
+        }
+    }
+}

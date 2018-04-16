@@ -1,0 +1,11 @@
+server.port: 8080
+management.server.port: 9080
+management.endpoints.web.exposure.include: health, prometheus, loggers
+spring:
+  application.name: {{prettyName}}
+  sleuth.web.skipPattern: /ping|/favicon.ico|
+  jackson:
+    serialization.write_dates_as_timestamps: false
+    deserialization.adjust_dates_to_context_time_zone: false
+
+logging.level.com.sprinthive: DEBUG

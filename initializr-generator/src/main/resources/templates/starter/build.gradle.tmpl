@@ -1,0 +1,94 @@
+buildscript {
+	ext {
+		{{#buildPropertiesGradle}}
+		{{key}} = '{{value}}'
+		{{/buildPropertiesGradle}}
+	}
+	repositories {
+		mavenCentral()
+		{{^isRelease}}
+		maven { url "https://repo.spring.io/snapshot" }
+		maven { url "https://repo.spring.io/milestone" }
+		{{/isRelease}}
+	}
+	dependencies {
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+		{{^bootOneThreeAvailable}}
+		classpath('io.spring.gradle:dependency-management-plugin:{{dependencyManagementPluginVersion}}')
+		{{/bootOneThreeAvailable}}
+	}
+}
+
+apply plugin: '{{language}}'
+apply plugin: 'eclipse'
+apply plugin: '{{springBootPluginName}}'
+{{^bootOneThreeAvailable}}
+apply plugin: 'io.spring.dependency-management'
+{{/bootOneThreeAvailable}}
+{{#bootTwoZeroAvailable}}
+apply plugin: 'io.spring.dependency-management'
+{{/bootTwoZeroAvailable}}
+
+group = '{{groupId}}'
+version = '{{version}}'
+sourceCompatibility = {{javaVersion}}
+
+bootJar {
+    baseName "{{name}}"
+}
+
+repositories {
+	mavenCentral()
+	{{#repositoryValues}}
+	maven { url "{{value.url}}" }
+	{{/repositoryValues}}
+}
+
+{{#providedDependencies}}
+configurations {
+	providedRuntime
+}
+{{/providedDependencies}}
+
+{{^buildPropertiesVersions.empty}}
+ext {
+	{{#buildPropertiesVersions}}
+	{{key}} = '{{value}}'
+{{/buildPropertiesVersions}}
+}
+
+{{/buildPropertiesVersions.empty}}
+dependencies {
+	{{#compileDependencies}}
+	compile('{{groupId}}:{{artifactId}}{{#version}}:{{version}}{{/version}}{{#type}}@{{type}}{{/type}}')
+	{{/compileDependencies}}
+	compile('org.springframework.boot:spring-boot-starter-web')
+	compile('org.springframework.boot:spring-boot-starter-actuator')
+	compile('io.micrometer:micrometer-registry-prometheus:1.0.3')
+	compile('net.logstash.logback:logstash-logback-encoder:4.11')
+	compile('com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.9.1')
+	compile('org.projectlombok:lombok:1.16.18')
+	{{#runtimeDependencies}}
+	runtime('{{groupId}}:{{artifactId}}{{#version}}:{{version}}{{/version}}{{#type}}@{{type}}{{/type}}')
+	{{/runtimeDependencies}}
+	{{#compileOnlyDependencies}}
+	compileOnly('{{groupId}}:{{artifactId}}{{#version}}:{{version}}{{/version}}{{#type}}@{{type}}{{/type}}')
+	{{/compileOnlyDependencies}}
+	{{#providedDependencies}}
+	providedRuntime('{{groupId}}:{{artifactId}}{{#version}}:{{version}}{{/version}}{{#type}}@{{type}}{{/type}}')
+	{{/providedDependencies}}
+	testCompile('org.springframework.boot:spring-boot-starter-test')
+	{{#testDependencies}}
+	testCompile('{{groupId}}:{{artifactId}}{{#version}}:{{version}}{{/version}}{{#type}}@{{type}}{{/type}}')
+	{{/testDependencies}}
+}
+{{#hasBoms}}
+
+dependencyManagement {
+	imports {
+		{{#reversedBoms}}
+		mavenBom "{{groupId}}:{{artifactId}}:{{versionToken}}"
+		{{/reversedBoms}}
+	}
+}
+{{/hasBoms}}

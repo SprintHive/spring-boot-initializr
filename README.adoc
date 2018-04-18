@@ -37,7 +37,7 @@ Navigate to http://localhost:8080 and you should have a working initializr.
 Once you have made a change that you want to publish to the live version:
 
 * Commit and push the change
-* Wait for the docker image to be built by Quay.io
+* Wait for the docker image to be built by Quay.io: https://quay.io/repository/sprinthive/spring-boot-initializr
 * Change your current kubernetes context to the fabric8 cluster
 * Delete the currently running spring-boot-initializr pod(s): ```kubectl get po -o name | grep spring-boot-initializr | xargs kubectl delete```
 

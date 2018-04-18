@@ -6,7 +6,7 @@
 
 Spring Initializr provides an extensible API to generate quickstart projects. It also
 provides a configurable service (you can see our default instance at
-link:https://start.spring.io[]). It provides a simple web UI to configure the project
+link:http://cellstarter.sprinthive.tech[]). It provides a simple web UI to configure the project
 to generate and endpoints that you can use via plain HTTP.
 
 Spring Initializr also exposes an endpoint that serves its metadata in a well-known
@@ -24,9 +24,24 @@ https://github.com/spring-io/initializr/milestones[milestones page] for an overv
 of changes
 
 == Installation and Getting Started
-The {docs}/htmlsingle/[reference documentation] is published in
-{docs}/htmlsingle/[HTML] and {docs}/epub/spring-initializr-reference.epub[EPUB] formats.
 
+```
+git clone https://github.com/SprintHive/spring-boot-initializr.git
+cd spring-boot-initializr
+mvn clean package
+java -jar initializr-service/target/initializr-service.jar
+```
+
+Navigate to http://localhost:8080 and you should have a working initializr.
+
+Once you have made a change that you want to publish to the live version:
+
+* Commit and push the change
+* Wait for the docker image to be built by Quay.io
+* Change your current kubernetes context to the fabric8 cluster
+* Delete the currently running spring-boot-initializr pod(s): ```kubectl get po -o name | grep spring-boot-initializr | xargs kubectl delete```
+
+The above process will change once we setup CD for this project.
 
 == Modules
 Spring Initializr has the following modules:
@@ -36,38 +51,31 @@ in many environments (including embedded in your own project)
 * `initializr-web`: REST endpoints and web interface
 * `initializr-actuator`: optional module to provide statistics and metrics on project
 generation
-* `initializr-docs`: documentation
 
 `initializr-service` is an additional module that represents the production instance
-that is available at link:https://start.spring.io[]. It is not enabled by default but
+that is available at link:http://cellstarter.sprinthive.tech[]. It is not enabled by default but
 you can enable the `full` profile in your IDE to easily run it locally.
 
 == Supported interfaces
 
 Spring Initializr can be used as follows:
 
-* With your browser (i.e. link:https://start.spring.io[])
+* With your browser (i.e. link:http://cellstarter.sprinthive.tech[])
 * In your IDE if you are using STS, IntelliJ IDEA Ultimate or NetBeans (with
 https://github.com/AlexFalappa/nb-springboot[this plugin])
 * On the command-line with {boot-doc}/#cli-init[the Spring Boot CLI] or simply with
 `cURL` or `HTTPie`
 
-[TIP]
-====
-You can "curl" an instance to get a usage page with examples (try
-`curl start.spring.io`)
-====
-
 == Generating a project
 If you click on "Generate Project" on the web ui of our instance, it will download a
-project archive with a Maven-based project and the necessary infrastructure to start
+project archive with a Gradle-based project and the necessary infrastructure to start
 a basic Spring Boot app.
 
 You could achieve the same result with a simple `curl` command
 
 [source,bash]
 ----
-$ curl https://start.spring.io/starter.zip -o demo.zip
+$ curl http://cellstarter.sprinthive.tech/starter.zip -o demo.zip
 ----
 
 The web ui exposes a bunch of options that you can configure. These are mapped to the
@@ -102,7 +110,7 @@ Groovy project using the actuator:
 
 [source,bash]
 ----
-$ curl https://start.spring.io/starter.tgz -d dependencies=web,actuator \
+$ curl http://cellstarter.sprinthive.tech/starter.tgz -d dependencies=web,actuator \
 -d language=groovy -d type=gradle-project -d baseDir=another-project | tar -xzvf -
 ----
 
@@ -121,7 +129,7 @@ set the name to `Groovy Sample`:
 
 [source,bash]
 ----
-https://start.spring.io/#!language=groovy&name=Groovy%20Sample
+http://cellstarter.sprinthive.tech/#!language=groovy&name=Groovy%20Sample
 ----
 
 The following hashbang parameters are supported: `type`, `groupId`, `artifactId`,
@@ -136,15 +144,7 @@ third-party clients. You can grab the metadata by _curling_ the root
 
 [source,bash]
 ----
-$ curl -H 'Accept: application/json' https://start.spring.io
-----
-
-NOTE: As stated above, if you use `curl` without an accept header, you'll retrieve a
-human readable text version of the metadata. `HTTPie` is also supported:
-
-[source,bash]
-----
-$ http https://start.spring.io Accept:application/json
+$ curl -H 'Accept: application/json' http://cellstarter.sprinthive.tech
 ----
 
 The metadata basically lists the _capabilities_ of the service, that is the available
@@ -158,129 +158,7 @@ default `name` for the project).
 NOTE: More details about the structure of the metadata are
 {docs}/htmlsingle/#metadata-format[available in the documentation].
 
-== Running your own instance
-
-You can easily run your own instance. The `initializr-web` modules uses Spring Boot
-so when it is added to a project, it will trigger the necessary auto-configuration to
-deploy the service.
-
-You first need to create or update your configuration to define the necessary
-attributes that your instance will use. Again, check the documentation for a
-{docs}/htmlsingle/#configuration-format[description of the configuration] and
-{code}/initializr-service/application.yml[review our own config] for a sample.
-
-You can integrate the library in a traditional Java-based project or by writing the
-super-simple script below:
-
-[source,groovy]
-----
-package org.acme.myapp
-
-@Grab('io.spring.initializr:initializr-web:1.0.0.BUILD-SNAPSHOT')
-@Grab('spring-boot-starter-web')
-class YourInitializrApplication { }
-----
-
-NOTE: Spring Initializr is not available on Maven central yet so you will have to
-build it <<build,from source>> in order to use it in your own environment.
-
-Once you have created that script (`my-instance.groovy`), place your configuration
-in the same directory and simply execute this command to start the service:
-
-[source,bash]
-----
-$ spring run my-instance.groovy
-----
-
-You may also want to <<run-app,run the default instance locally>>.
-
-
-[[build]]
-== Building from Source
-
-You need Java 1.8 and a bash-like shell.
-
-[[building]]
-=== Building
-
-Just invoke the build at the root of the project
-
-[indent=0]
-----
-    $ ./mvnw clean install
-----
-
-If you want to run the smoke tests using Geb, you need to enable the
-`smokeTests` profile. Firefox should also be installed on your machine:
-
-[indent=0]
-----
-    $ ./mvnw verify -PsmokeTests
-----
-
-If you want to build both the library and the service, you can enable the `full`
-profile:
-
-[indent=0]
-----
-    $ ./mvnw clean install -Pfull
-----
-
-
-[[run-app]]
-=== Running the app locally
-
-Once you have <<building, built the library>>, you can easily start the app as any
-other Spring Boot app from the `initializr-service` directory:
-
-[indent=0]
-----
-    $ cd initializr-service
-    $ ../mvnw spring-boot:run
-----
-
-[[run-ide]]
-=== Running the app in an IDE
-
-You should be able to import the projects into your IDE with no problems. Once there you
-can run the `initializr-service` from its main method, debug it, and it will reload if
-you make changes to other modules. (You may need to manually enable the "full" profile.)
-This is the recommended way to operate while you are developing the application,
-especially the UI.
-
-
-## Deploying to Cloud Foundry
-
-If you are on a Mac and using http://brew.sh/[homebrew], install the Cloud Foundry
-CLI:
-
-[indent=0]
-----
-    $ brew install cloudfoundry-cli
-----
-
-Alternatively, download a suitable binary for your platform from
-https://console.run.pivotal.io/tools[Pivotal Web Services].
-
-You should ensure that the application name and URL (name and host values) are
-suitable for your environment before running `cf push`.
-
-First, make sure that you have <<building, built the library>>, then make sure first
-that the jar has been created:
-
-[indent=0]
-----
-    $ cd initializr-service
-    $ ../mvnw package
-----
-
-Once the jar has been created, you can push the application:
-
-[indent=0]
-----
-    $ cf push your-initializr -p target/initializr-service.jar
-----
-
 == License
 Spring Initializr is Open Source software released under the
 http://www.apache.org/licenses/LICENSE-2.0.html[Apache 2.0 license].
+

@@ -3,7 +3,11 @@ management.server.port: 9080
 management.endpoints.web.exposure.include: health, prometheus, loggers
 spring:
   application.name: {{prettyName}}
-  sleuth.web.skipPattern: /ping|/favicon.ico|
+  sleuth:
+    web.skipPattern: /favicon.ico|
+    sampler.percentage: 0.1
+    traceId128: true
+  zipkin.baseUrl: http://zipkin.infra:9411
   jackson:
     serialization.write_dates_as_timestamps: false
     deserialization.adjust_dates_to_context_time_zone: false

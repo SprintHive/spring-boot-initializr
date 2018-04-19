@@ -73,12 +73,9 @@ initializr:
           - versionRange: "[2.0.0.RC2,2.0.0.RC2]"
             version: Finchley.M7
             repositories: spring-milestones
-          - versionRange: "[2.0.0.RELEASE,2.0.0.RELEASE]"
+          - versionRange: "[2.0.0.RELEASE,2.0.1.RELEASE]"
             version: Finchley.M9
             repositories: spring-milestones
-          - versionRange: "2.0.0.BUILD-SNAPSHOT"
-            version: Finchley.BUILD-SNAPSHOT
-            repositories: spring-snapshots,spring-milestones
       spring-cloud-services:
         groupId: io.pivotal.spring.cloud
         artifactId: spring-cloud-services-dependencies

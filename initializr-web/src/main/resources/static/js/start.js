@@ -278,4 +278,8 @@ $(function () {
             applyParams();
         }
     }
+    $(document).ready(function() {
+      $("input[value='cloud-starter-sleuth'").click();
+      $("input[value='cloud-starter-zipkin'").click();
+    });
 });

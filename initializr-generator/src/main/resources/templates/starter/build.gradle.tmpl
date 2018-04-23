@@ -5,6 +5,7 @@ buildscript {
         {{/buildPropertiesGradle}}
     }
     repositories {
+        mavenLocal()
         mavenCentral()
         {{^isRelease}}
         maven { url "https://repo.spring.io/snapshot" }
@@ -38,6 +39,7 @@ bootJar {
 }
 
 repositories {
+    mavenLocal()
     maven {
         credentials {
             username 'admin'

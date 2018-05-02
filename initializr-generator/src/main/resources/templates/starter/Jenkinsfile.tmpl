@@ -7,8 +7,23 @@ def resourcesDir = 'config/kubernetes'
 def dockerImage
 
 gradleNode(label: 'gradle-and-docker') {
+
+    def namespace = ''
+    def deployStage = ''
+
     stage('Compile source') {
-        checkout scm
+        def scmInfo = checkout scm
+        if (scmInfo == null || scmInfo.GIT_BRANCH == null) {
+            currentBuild.result = 'ABORTED'
+            error('Git branch is null…')
+        } else if (scmInfo.GIT_BRANCH == 'origin/master') {
+            namespace = 'pre-prod'
+            deployStage = 'pre-production'
+        } else {
+            namespace = scmInfo.GIT_BRANCH.startsWith('origin/') ? scmInfo.GIT_BRANCH - 'origin/' : scmInfo.GIT_BRANCH
+            deployStage = namespace
+        }
+
         versionTag = getNewVersion {}
         dockerImage = "${componentName}:${versionTag}"
 
@@ -23,10 +38,7 @@ gradleNode(label: 'gradle-and-docker') {
         }
     }
 
-    stage('Rollout to Local') {
-        def namespace = 'local'
-        def deployStage = 'development'
-
+    stage("Rollout to ${namespace}") {
         def kubeResources = kubeResourcesFromTemplates {
             templates = [
                 readFile(resourcesDir + '/deployment.yaml'),

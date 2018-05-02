@@ -16,12 +16,12 @@ gradleNode(label: 'gradle-and-docker') {
         if (scmInfo == null || scmInfo.GIT_BRANCH == null) {
             currentBuild.result = 'ABORTED'
             error('Git branch is null…')
-        } else if (scmInfo.GIT_BRANCH.equals('origin/dev')) {
-            namespace = 'local'
-            deployStage = 'development'
-        } else if (scmInfo.GIT_BRANCH.equals('origin/master')) {
+        } else if (scmInfo.GIT_BRANCH == 'origin/master') {
             namespace = 'pre-prod'
             deployStage = 'pre-production'
+        } else {
+            namespace = scmInfo.GIT_BRANCH.startsWith('origin/') ? scmInfo.GIT_BRANCH - 'origin/' : scmInfo.GIT_BRANCH
+            deployStage = namespace
         }
 
         versionTag = getNewVersion {}

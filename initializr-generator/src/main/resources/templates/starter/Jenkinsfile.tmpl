@@ -24,7 +24,7 @@ javaNode {
             deployStage = namespace
         }
 
-        versionTag = getNewVersion {}
+        versionTag = getNewVersion{}
         dockerImage = "eu.gcr.io/jons-world/$componentName:${versionTag}"
 
         container(name: 'gradle') {
@@ -34,11 +34,10 @@ javaNode {
 
     stage('Publish docker image') {
         container('docker') {
-            sh "docker build -t ${dockerImage} ."
-            def img = docker.image(dockerImage)
             docker.withRegistry("https://eu.gcr.io", "gcr:honeypot-gcr-credentials") {
-                img.push()
-                img.push('latest')
+                sh "docker build -t ${dockerImage} ."
+                docker.image(dockerImage).push()
+                docker.image(dockerImage).push('latest')
             }
         }
     }

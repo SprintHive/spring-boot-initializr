@@ -260,21 +260,23 @@ public class MainController extends AbstractInitializrController {
 
 		File download = projectGenerator.createDistributionFile(dir, ".zip");
 
-		String wrapperScript = getWrapperScript(request);
-		new File(dir, wrapperScript).setExecutable(true);
+        String wrapperScript = getWrapperScript(request);
+        String initScript = getInitScript(request);
+        new File(dir, wrapperScript).setExecutable(true);
+        new File(dir, initScript).setExecutable(true);
 		Zip zip = new Zip();
 		zip.setProject(new Project());
 		zip.setDefaultexcludes(false);
 		ZipFileSet set = new ZipFileSet();
 		set.setDir(dir);
 		set.setFileMode("755");
-		set.setIncludes(wrapperScript);
+        set.setIncludes(wrapperScript + "," + initScript);
 		set.setDefaultexcludes(false);
 		zip.addFileset(set);
 		set = new ZipFileSet();
 		set.setDir(dir);
 		set.setIncludes("**,");
-		set.setExcludes(wrapperScript);
+        set.setExcludes(wrapperScript + "," + initScript);
 		set.setDefaultexcludes(false);
 		zip.addFileset(set);
 		zip.setDestFile(download.getCanonicalFile());
@@ -292,19 +294,21 @@ public class MainController extends AbstractInitializrController {
 		File download = projectGenerator.createDistributionFile(dir, ".tar.gz");
 
 		String wrapperScript = getWrapperScript(request);
+		String initScript = getInitScript(request);
 		new File(dir, wrapperScript).setExecutable(true);
+		new File(dir, initScript).setExecutable(true);
 		Tar zip = new Tar();
 		zip.setProject(new Project());
 		zip.setDefaultexcludes(false);
 		TarFileSet set = zip.createTarFileSet();
 		set.setDir(dir);
 		set.setFileMode("755");
-		set.setIncludes(wrapperScript);
+		set.setIncludes(wrapperScript + "," + initScript);
 		set.setDefaultexcludes(false);
 		set = zip.createTarFileSet();
 		set.setDir(dir);
 		set.setIncludes("**,");
-		set.setExcludes(wrapperScript);
+		set.setExcludes(wrapperScript + "," + initScript);
 		set.setDefaultexcludes(false);
 		zip.setDestFile(download.getCanonicalFile());
 		Tar.TarCompressionMethod method = new Tar.TarCompressionMethod();
@@ -327,6 +331,12 @@ public class MainController extends AbstractInitializrController {
 
 	private static String getWrapperScript(ProjectRequest request) {
 		String script = "gradle".equals(request.getBuild()) ? "gradlew" : "mvnw";
+		return request.getBaseDir() != null
+				? request.getBaseDir() + "/" + script : script;
+	}
+
+	private static String getInitScript(ProjectRequest request) {
+		String script = "init_project.sh";
 		return request.getBaseDir() != null
 				? request.getBaseDir() + "/" + script : script;
 	}

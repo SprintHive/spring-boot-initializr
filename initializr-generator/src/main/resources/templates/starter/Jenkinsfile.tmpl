@@ -24,7 +24,7 @@ gradleNode(label: 'gradle-and-docker') {
             deployStage = namespace
         }
 
-        versionTag = getNewVersion{}
+        versionTag = getNewVersion {}
         dockerImage = "eu.gcr.io/jons-world/$componentName:${versionTag}"
 
         container(name: 'gradle') {

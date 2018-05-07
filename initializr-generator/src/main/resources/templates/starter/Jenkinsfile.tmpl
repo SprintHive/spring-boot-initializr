@@ -6,7 +6,7 @@ def versionTag = ''
 def resourcesDir = 'config/kubernetes'
 def dockerImage
 
-gradleNode(label: 'gradle-and-docker') {
+javaNode {
 
     def namespace = ''
     def deployStage = ''
@@ -24,7 +24,7 @@ gradleNode(label: 'gradle-and-docker') {
             deployStage = namespace
         }
 
-        versionTag = getNewVersion {}
+        versionTag = getNewVersion{}
         dockerImage = "eu.gcr.io/jons-world/$componentName:${versionTag}"
 
         container(name: 'gradle') {
@@ -43,19 +43,16 @@ gradleNode(label: 'gradle-and-docker') {
     }
 
     stage("Rollout to ${namespace}") {
-        def kubeResources = kubeResourcesFromTemplates {
-            templates = [
-                readFile(resourcesDir + '/deployment.yaml'),
-                readFile(resourcesDir + '/service.yaml')
+        helmDeploy([
+            releaseName:  "{{name}}",
+            namespace:  namespace,
+            chartName:  "base-java",
+            imageTag:  versionTag,
+            overrides:  [
+                "name=$componentName",
+                "nameOverride=$componentName",
+                "image.repository=eu.gcr.io/jons-world/$componentName"
             ]
-            stage = deployStage
-            version = versionTag
-            image = dockerImage
-            name = componentName
-        }
-
-        for (String kubeResource : kubeResources) {
-            kubernetesApply(file: kubeResource, environment: namespace)
-        }
+        ])
     }
 }

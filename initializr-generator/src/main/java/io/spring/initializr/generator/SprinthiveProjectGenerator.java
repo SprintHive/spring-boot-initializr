@@ -66,9 +66,9 @@ public class SprinthiveProjectGenerator extends ProjectGenerator {
     private void createSrcFiles(File projectDir, String basePackagePath, String applicationName, Map<String, Object> model) {
         String javaName = getPrettyName(model.get("javaName").toString());
         File src = new File(new File(projectDir, "src/main/java"), basePackagePath);
-        writeTemplateFile(new File(src, applicationName + ".java"), "Application.java", model);
+        writeTemplateFile(new File(src, applicationName + ".kt"), "Application.kt", model);
         writeTemplateFile(new File(src, "controller/" + javaName + "RestController.java"), "RestController.java", model);
-        writeTemplateFile(new File(src, "domain/" + javaName + ".java"), "Domain.java", model);
+        writeTemplateFile(new File(src, "domain/" + javaName + ".kt"), "Domain.kt", model);
         writeTemplateFile(new File(src, javaName + "Config.java"), "ServiceConfig.java", model);
         writeTemplateFile(new File(src, "controller/model/GreetingRequestV1.java"), "GreetingRequestV1.java", model);
         writeTemplateFile(new File(src, "controller/model/GreetingResponseV1.java"), "GreetingResponseV1.java", model);
@@ -83,7 +83,7 @@ public class SprinthiveProjectGenerator extends ProjectGenerator {
         String javaName = getPrettyName(model.get("javaName").toString());
         File test = new File(new File(projectDir, "src/test/java"), basePackagePath);
         setupTestModel(request, model);
-        writeTemplateFile(new File(test, applicationName + "Tests.java"), "ApplicationTests.java", model);
+        writeTemplateFile(new File(test, applicationName + "Tests.kt"), "ApplicationTests.kt", model);
         writeTemplateFile(new File(test, "domain/" + javaName + "Test.java"), "DomainTest.java", model);
     }
 

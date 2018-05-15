@@ -22,6 +22,9 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -260,23 +263,21 @@ public class MainController extends AbstractInitializrController {
 
 		File download = projectGenerator.createDistributionFile(dir, ".zip");
 
-        String wrapperScript = getWrapperScript(request);
-        String initScript = getInitScript(request);
-        new File(dir, wrapperScript).setExecutable(true);
-        new File(dir, initScript).setExecutable(true);
+		List<String> scripts = executableScripts(request);
+		scripts.forEach(scriptPath -> new File(dir, scriptPath).setExecutable(true));
 		Zip zip = new Zip();
 		zip.setProject(new Project());
 		zip.setDefaultexcludes(false);
 		ZipFileSet set = new ZipFileSet();
 		set.setDir(dir);
 		set.setFileMode("755");
-        set.setIncludes(wrapperScript + "," + initScript);
+        set.setIncludes(String.join(",", scripts));
 		set.setDefaultexcludes(false);
 		zip.addFileset(set);
 		set = new ZipFileSet();
 		set.setDir(dir);
 		set.setIncludes("**,");
-        set.setExcludes(wrapperScript + "," + initScript);
+		set.setExcludes(String.join(",", scripts));
 		set.setDefaultexcludes(false);
 		zip.addFileset(set);
 		zip.setDestFile(download.getCanonicalFile());
@@ -293,22 +294,20 @@ public class MainController extends AbstractInitializrController {
 
 		File download = projectGenerator.createDistributionFile(dir, ".tar.gz");
 
-		String wrapperScript = getWrapperScript(request);
-		String initScript = getInitScript(request);
-		new File(dir, wrapperScript).setExecutable(true);
-		new File(dir, initScript).setExecutable(true);
+		List<String> scripts = executableScripts(request);
+		scripts.forEach(scriptPath -> new File(dir, scriptPath).setExecutable(true));
 		Tar zip = new Tar();
 		zip.setProject(new Project());
 		zip.setDefaultexcludes(false);
 		TarFileSet set = zip.createTarFileSet();
 		set.setDir(dir);
 		set.setFileMode("755");
-		set.setIncludes(wrapperScript + "," + initScript);
+		set.setIncludes(String.join(",", scripts));
 		set.setDefaultexcludes(false);
 		set = zip.createTarFileSet();
 		set.setDir(dir);
 		set.setIncludes("**,");
-		set.setExcludes(wrapperScript + "," + initScript);
+		set.setExcludes(String.join(",", scripts));
 		set.setDefaultexcludes(false);
 		zip.setDestFile(download.getCanonicalFile());
 		Tar.TarCompressionMethod method = new Tar.TarCompressionMethod();
@@ -329,18 +328,6 @@ public class MainController extends AbstractInitializrController {
 		}
 	}
 
-	private static String getWrapperScript(ProjectRequest request) {
-		String script = "gradle".equals(request.getBuild()) ? "gradlew" : "mvnw";
-		return request.getBaseDir() != null
-				? request.getBaseDir() + "/" + script : script;
-	}
-
-	private static String getInitScript(ProjectRequest request) {
-		String script = "init_project.sh";
-		return request.getBaseDir() != null
-				? request.getBaseDir() + "/" + script : script;
-	}
-
 	private ResponseEntity<byte[]> upload(File download, File dir, String fileName,
 			String contentType) throws IOException {
 		byte[] bytes = StreamUtils.copyToByteArray(new FileInputStream(download));
@@ -349,6 +336,16 @@ public class MainController extends AbstractInitializrController {
 				fileName);
 		projectGenerator.cleanTempFiles(dir);
 		return result;
+	}
+
+	private List<String> executableScripts(ProjectRequest request) {
+		List<String> scripts = new ArrayList<>();
+		String prefix = request.getBaseDir() != null ? request.getBaseDir() + "/" : "";
+		scripts.add(prefix + "gradlew");
+		scripts.add(prefix + "init_project.sh");
+		scripts.add(prefix + "bin/telepresence.sh");
+
+		return scripts;
 	}
 
 	private ResponseEntity<byte[]> createResponseEntity(byte[] content,

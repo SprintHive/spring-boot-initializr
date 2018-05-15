@@ -17,10 +17,17 @@ buildscript {
         {{^bootOneThreeAvailable}}
         classpath('io.spring.gradle:dependency-management-plugin:{{dependencyManagementPluginVersion}}')
         {{/bootOneThreeAvailable}}
+		{{#kotlin}}
+		classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlinVersion}")
+		classpath("org.jetbrains.kotlin:kotlin-allopen:${kotlinVersion}")
+		{{/kotlin}}
     }
 }
 
 apply plugin: '{{language}}'
+{{#kotlin}}
+apply plugin: 'kotlin-spring'
+{{/kotlin}}
 apply plugin: 'eclipse'
 apply plugin: '{{springBootPluginName}}'
 {{^bootOneThreeAvailable}}
@@ -33,6 +40,21 @@ apply plugin: 'io.spring.dependency-management'
 group = '{{groupId}}'
 version = '{{version}}'
 sourceCompatibility = {{javaVersion}}
+
+{{#kotlin}}
+compileKotlin {
+	kotlinOptions {
+		freeCompilerArgs = ["-Xjsr305=strict"]{{#java8OrLater}}
+		jvmTarget = "1.8"{{/java8OrLater}}
+	}
+}
+compileTestKotlin {
+	kotlinOptions {
+		freeCompilerArgs = ["-Xjsr305=strict"]{{#java8OrLater}}
+		jvmTarget = "1.8"{{/java8OrLater}}
+	}
+}
+{{/kotlin}}
 
 bootJar {
     baseName "{{name}}"
@@ -71,6 +93,10 @@ dependencies {
     {{#compileDependencies}}
     compile('{{groupId}}:{{artifactId}}{{#version}}:{{version}}{{/version}}{{#type}}@{{type}}{{/type}}')
     {{/compileDependencies}}
+	{{#kotlin}}
+	compile("org.jetbrains.kotlin:{{kotlinStdlibArtifactId}}{{^kotlinSupport}}:${kotlinVersion}{{/kotlinSupport}}")
+	compile("org.jetbrains.kotlin:kotlin-reflect{{^kotlinSupport}}:${kotlinVersion}{{/kotlinSupport}}")
+	{{/kotlin}}
     compile('org.springframework.boot:spring-boot-starter-web')
     compile('org.springframework.boot:spring-boot-starter-actuator')
     compile('org.springframework.boot:spring-boot-starter-json')

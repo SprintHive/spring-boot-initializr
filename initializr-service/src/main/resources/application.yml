@@ -73,8 +73,8 @@ initializr:
           - versionRange: "[2.0.0.RC2,2.0.0.RC2]"
             version: Finchley.M7
             repositories: spring-milestones
-          - versionRange: "[2.0.0.RELEASE,2.0.1.RELEASE]"
-            version: Finchley.M9
+          - versionRange: "[2.0.0.RELEASE,2.0.9.RELEASE]"
+            version: Finchley.RC1
             repositories: spring-milestones
       spring-cloud-services:
         groupId: io.pivotal.spring.cloud
@@ -1256,6 +1256,6 @@ initializr:
       name: 8
       default: true
   languages:
-    - name: Java
-      id: java
+    - name: Kotlin
+      id: kotlin
       default: true

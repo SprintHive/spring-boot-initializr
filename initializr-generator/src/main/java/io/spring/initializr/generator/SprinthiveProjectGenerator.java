@@ -21,9 +21,6 @@ public class SprinthiveProjectGenerator extends ProjectGenerator {
     @Value("${TMPDIR:/tmp}/initializr")
     private String tempDir;
 
-    private static final String TMPL_DIR_NAME = "starter";
-    private static final String TMPL_DIR_PATH = "templates/" + TMPL_DIR_NAME;
-
     // The base class will clean up these files
     private transient Map<String, List<File>> temporaryFiles = new LinkedHashMap<>();
 
@@ -41,7 +38,7 @@ public class SprinthiveProjectGenerator extends ProjectGenerator {
         File projectDir = initializerProjectDir(rootDir, request);
         String applicationName = request.getApplicationName();
 
-        writeStarterFiles(projectDir, model);
+        writeStarterFiles(projectDir, model, "starter-base");
         createSrcFiles(projectDir, basePackagePath, applicationName, model);
         createTestFiles(projectDir, basePackagePath, applicationName, request, model);
         createResourceFiles(projectDir);
@@ -64,27 +61,13 @@ public class SprinthiveProjectGenerator extends ProjectGenerator {
     }
 
     private void createSrcFiles(File projectDir, String basePackagePath, String applicationName, Map<String, Object> model) {
-        String javaName = getPrettyName(model.get("javaName").toString());
-        File src = new File(new File(projectDir, "src/main/java"), basePackagePath);
-        writeTemplateFile(new File(src, applicationName + ".kt"), "Application.kt", model);
-        writeTemplateFile(new File(src, "controller/" + javaName + "RestController.java"), "RestController.java", model);
-        writeTemplateFile(new File(src, "domain/" + javaName + ".kt"), "Domain.kt", model);
-        writeTemplateFile(new File(src, javaName + "Config.java"), "ServiceConfig.java", model);
-        writeTemplateFile(new File(src, "controller/model/GreetingRequestV1.java"), "GreetingRequestV1.java", model);
-        writeTemplateFile(new File(src, "controller/model/GreetingResponseV1.java"), "GreetingResponseV1.java", model);
-    }
-
-    private void writeTemplateFile(File file, String templateName, Map<String, Object> model) {
-        ensurePathExists(file);
-        write(file, templateName, model);
+        File targetSrcDir = new File(new File(projectDir, "src/main/java"), basePackagePath);
+        writeStarterFiles(targetSrcDir, model, "starter-src-package");
     }
 
     private void createTestFiles(File projectDir, String basePackagePath, String applicationName, ProjectRequest request, Map<String, Object> model) {
-        String javaName = getPrettyName(model.get("javaName").toString());
-        File test = new File(new File(projectDir, "src/test/java"), basePackagePath);
-        setupTestModel(request, model);
-        writeTemplateFile(new File(test, applicationName + "Tests.kt"), "ApplicationTests.kt", model);
-        writeTemplateFile(new File(test, "domain/" + javaName + "Test.java"), "DomainTest.java", model);
+        File targetTestDir = new File(new File(projectDir, "src/test/java"), basePackagePath);
+        writeStarterFiles(targetTestDir, model, "starter-test-package");
     }
 
     private void createResourceFiles(File projectDir) {
@@ -133,18 +116,23 @@ public class SprinthiveProjectGenerator extends ProjectGenerator {
         }
     }
 
-    private void writeStarterFiles(File targetDir, Map<String, Object> model) {
-        Resource[] starterResources = getStarterResources();
+    private void writeStarterFiles(File targetDir, Map<String, Object> model, String templateDir) {
+        Resource[] starterResources = getDirResources(templateDir);
+        String templateDirPath = "templates/" + templateDir;
 
         for (Resource starterResource : starterResources) {
             String resourcePath = getResourcePath(starterResource);
             if (!resourcePath.endsWith("/")) {
 
-                String relativePath = resourcePath.substring(resourcePath.indexOf(TMPL_DIR_PATH) + TMPL_DIR_PATH.length());
-                File targetFile = new File(targetDir, relativePath.replace(".tmpl", ""));
+                String relativePath = resourcePath.substring(resourcePath.indexOf(templateDirPath) +
+                        templateDirPath.length());
+                relativePath = relativePath.replace("%7b", "{");
+                relativePath = relativePath.replace("%7d", "}");
+                String targetFilePath = templateRenderer.processString(relativePath, model);
+                File targetFile = new File(targetDir, targetFilePath.replace(".bin", ""));
                 ensurePathExists(targetFile);
-                if (starterResource.getFilename().endsWith(".tmpl")) {
-                    write(targetFile, TMPL_DIR_NAME + relativePath, model);
+                if (!relativePath.endsWith(".bin")) {
+                    write(targetFile, templateDir + relativePath, model);
                 } else {
                     try {
                         writeBinary(targetFile, StreamUtils.copyToByteArray(starterResource.getInputStream()));
@@ -170,8 +158,8 @@ public class SprinthiveProjectGenerator extends ProjectGenerator {
         }
     }
 
-    private Resource[] getStarterResources() {
-        String prefix = "classpath:/" + TMPL_DIR_PATH + "/**";
+    private Resource[] getDirResources(String directory) {
+        String prefix = "classpath:/templates/" + directory + "/**";
         try {
             return new PathMatchingResourcePatternResolver().getResources(prefix);
         } catch (IOException e) {

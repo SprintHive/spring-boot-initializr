@@ -73,6 +73,17 @@ public class TemplateRenderer {
 		}
 	}
 
+	public String processString(String templateString, Map<String, ?> model) {
+		try {
+			Template template = mustache.compile(templateString);
+			return template.execute(model);
+		}
+		catch (Exception e) {
+			log.error("Cannot render: " + templateString, e);
+			throw new IllegalStateException("Cannot render template", e);
+		}
+	}
+
 	public Template getTemplate(String name) {
 		if (cache) {
 			return this.templateCaches.computeIfAbsent(name, this::loadTemplate);

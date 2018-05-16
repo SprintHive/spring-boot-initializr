@@ -92,7 +92,7 @@ public class ProjectGenerator {
 	private ProjectRequestResolver requestResolver;
 
 	@Autowired
-	private TemplateRenderer templateRenderer = new TemplateRenderer();
+	protected TemplateRenderer templateRenderer = new TemplateRenderer();
 
 	@Autowired
 	private ProjectResourceLocator projectResourceLocator = new ProjectResourceLocator();

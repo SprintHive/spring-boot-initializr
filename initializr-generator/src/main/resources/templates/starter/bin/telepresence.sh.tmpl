@@ -1,9 +1,0 @@
-#!/bin/sh
-
-telepresence --swap-deployment {{name}}-v1 \
-  --docker-run --rm \
-  -v$(pwd):/app \
-  -v$HOME/.gradle:/home/gradle/.gradle \
-  -p 8080:8080 \
-  gradle:jdk8-alpine \
-  sh -c "gradle --no-daemon -p /app bootJar; java -jar /app/build/libs/{{name}}-0.0.1-SNAPSHOT.jar"

@@ -2,7 +2,8 @@ server.port: 8080
 management.server.port: 9080
 management.endpoints.web.exposure.include: health, prometheus, loggers
 spring:
-  application.name: {{prettyName}}
+  mvc.throw-exception-if-no-handler-found: true
+  resources.add-mappings: false
   sleuth:
     web.skipPattern: /favicon.ico|
     sampler.percentage: 0.1

@@ -15,7 +15,6 @@ import javax.validation.Valid;
 
 @Slf4j
 @RestController
-@RequestMapping("/v1")
 public class {{javaName}}RestController {
 
     @Autowired

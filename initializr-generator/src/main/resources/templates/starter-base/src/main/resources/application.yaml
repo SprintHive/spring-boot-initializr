@@ -6,9 +6,10 @@ spring:
   resources.add-mappings: false
   sleuth:
     web.skipPattern: /favicon.ico|
-    sampler.percentage: 0.1
+    sampler.probability : 0.1
     traceId128: true
   zipkin.baseUrl: http://zipkin.infra:9411
+  zipkin.sender.type: web
   jackson:
     serialization.write_dates_as_timestamps: false
     deserialization.adjust_dates_to_context_time_zone: false
